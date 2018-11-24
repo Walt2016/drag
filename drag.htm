@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' />
+    <title>resize</title>
+</head>
+<style>
+* {
+    -webkit-text-size-adjust: none;
+}
+
+q .customize-overlay:hover,
+.customize-overlay.active,
+.customize-overlay[isactive],
+.selected .customize-overlay {
+    background: rgba(66, 185, 131, .2);
+}
+
+.customizing .customize-overlay>* {
+    -webkit-transform: scale(1.428571428571429);
+    transform: scale(1.428571428571429);
+}
+
+.customize-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+
+    /*  width: 30vw;
+    height: 30vw;*/
+    z-index: 1;
+    border-radius: 3px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    cursor: move;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    /*border: 1px solid transparent;*/
+    border: 1px dashed #ccc;
+}
+
+.customize-overlay.center {
+    left: 50%;
+    top: 50%;
+    /* transform: translate(-50%, -50%);*/
+
+    /*margin-left: -15vw;
+    margin-top: -15vw;*/
+    transition: all 0.5s;
+    margin-left: -50px;
+    margin-top: -50px;
+}
+
+.content-wrapper,
+.wrapper {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    position: relative;
+}
+
+.resize-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #8cd6b5;
+}
+
+
+.resize-handle.bottom-right,
+.resize-handle.top-left {
+    cursor: nwse-resize;
+}
+
+.resize-handle.bottom,
+.resize-handle.top {
+    left: calc(50% - 6px);
+    cursor: ns-resize;
+}
+
+.resize-handle.bottom-left,
+.resize-handle.top-right {
+    cursor: nesw-resize;
+}
+
+.resize-handle.left,
+.resize-handle.right {
+    top: calc(50% - 6px);
+    cursor: ew-resize;
+}
+
+.resize-handle.bottom-left,
+.resize-handle.left,
+.resize-handle.top-left {
+    left: -6px;
+}
+
+.resize-handle.bottom-right,
+.resize-handle.right,
+.resize-handle.top-right {
+    right: -6px;
+}
+
+.resize-handle.top,
+.resize-handle.top-left,
+.resize-handle.top-right {
+    top: -6px;
+}
+
+.resize-handle.bottom,
+.resize-handle.bottom-left,
+.resize-handle.bottom-right {
+    bottom: -6px;
+}
+
+.btn-group {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+
+}
+
+.btn-group .btn {
+    background: #dedede;
+    padding: 0px 10px;
+    font-size: 12px;
+    height: 30px;
+    line-height: 30px;
+    /*border-radius: 4px;*/
+    cursor: pointer;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: v
+}
+
+.btn-group .btn:hover {
+    background: #ccc;
+}
+
+.btn-group .btn .icon {
+    flex-shrink: 0;
+    width: 0;
+    height: 0;
+    border-width: 6px;
+    border-style: solid;
+    border-top-color: black;
+    border-right-color: black;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    margin-right: -10px;
+    display: none;
+}
+
+.btn-group .btn.rotate .icon {
+    border-top-color: #F5A623;
+    border-right-color: #F5A623;
+}
+
+.btn-group .btn.skew .icon {
+    border-top-color: #88BFFF;
+    border-right-color: #88BFFF;
+}
+
+.btn-group .btn[isactive] .icon {
+    display: block;
+}
+
+.container {
+    position: relative;
+    background: #dedede;
+    width: 80vw;
+    height: 80vh;
+    /*bor*/
+}
+</style>
+
+<body>
+    <div class="btn-group">
+        <div class="btn add">add <div class="icon"></div>
+        </div>
+        <div class="btn rotate">rotate
+            <div class="icon"></div>
+        </div>
+        <div class="btn skew">skew
+            <div class="icon"></div>
+        </div>
+    </div>
+    <div class="container">
+    </div>
+    <!--     <div class="customize-overlay center">
+         <div class="definition-chip">
+            <div class="item-logo icon">
+                <div class="wrapper">
+                    <div class="vue-ui-icon"><svg>
+                            <use xlink:href="#ic_rss_feed_24px"></use>
+                        </svg></div>
+                </div>
+            </div>
+            <div class="title">The Official Vue News</div>
+        </div>
+       <button type="button" tabindex="0" role="button" class="vue-ui-button remove-button primary flat icon-button button has-tooltip">
+            <span class="content"><div class="vue-ui-icon button-icon left"><svg><use xlink:href="#ic_close_24px"></use></svg></div> <span class="default-slot">  </span>
+            </span>
+        </button>
+        <div class="resize-handle top-left"></div>
+        <div class="resize-handle top"></div>
+        <div class="resize-handle top-right"></div>
+        <div class="resize-handle right"></div>
+        <div class="resize-handle bottom-right"></div>
+        <div class="resize-handle bottom"></div>
+        <div class="resize-handle bottom-left"></div>
+        <div class="resize-handle left"></div>
+    </div> -->
+    <script>
+    'use strict';
+    //定义类属性    方法不允许枚举
+    var createClass = function() {
+        function defineProperties(target, props) {
+            for (var key in props) {
+                if (target.hasOwnProperty(key)) {
+                    console.log(_.type(target) + " hasOwnProperty " + key)
+                } else {
+                    //不覆盖已有属性
+                    var descriptor = {
+                        key: key,
+                        value: props[key],
+                        enumerable: false,
+                        configurable: true,
+                        writable: true
+                    }
+                    Object.defineProperty(target, key, descriptor);
+                }
+            }
+        }
+        return function(Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) defineProperties(Constructor, staticProps);
+            return Constructor;
+        };
+    }();
+
+    var dragger = function() {
+        function Dragger(options) {
+            if (!(this instanceof Dragger)) return new Dragger(options);
+            this.btns = document.querySelectorAll(".btn");
+            this.btnGroup = document.querySelector(".btn-group")
+            this.container = document.querySelector(".container")
+            this.screen = {
+                // x: document.documentElement.clientWidth,
+                // y: document.documentElement.clientHeight
+                left: this.getLeft(this.container),
+                top: this.getTop(this.container),
+                width: this.getWidth(this.container),
+                height: this.getHeight(this.container)
+            };
+            this.id = 0;
+            this.setup();
+        }
+
+        return createClass(Dragger, {
+            createOverlay: function() {
+                var frag = document.createDocumentFragment()
+                var overlay = document.createElement("div");
+                overlay.id = "overlay_" + this.id++;
+                overlay.innerText = this.id
+                overlay.className = "customize-overlay center";
+                ['top', 'right', 'bottom', 'left', 'top-left', 'top-right', 'bottom-left', 'bottom-right'].forEach(function(t) {
+                    var div = document.createElement("div");
+                    div.className = "resize-handle " + t;
+                    overlay.appendChild(div);
+                })
+                frag.appendChild(overlay)
+
+                document.querySelector(".container").appendChild(frag)
+                // this.overlays.push(frag);
+            },
+            getStyle: function(el, attr) {
+                return window.getComputedStyle ? window.getComputedStyle(el, null)[attr] : el.currentStyle[attr]
+            },
+            getWidth: function(el) {
+                return parseFloat(this.getStyle(el, "width"))
+            },
+            getHeight: function(el) {
+                return parseFloat(this.getStyle(el, "height"))
+            },
+            getTop: function(el) {
+                return parseFloat(this.getStyle(el, "top"))
+            },
+            getMinTop: function(el) {
+                return -parseFloat(this.getStyle(el, "margin-top"))
+            },
+            getMaxTop: function(el) {
+                return this.screen.height - this.getHeight(el) + this.getMinTop(el);
+            },
+            getLeft: function(el) {
+                return parseFloat(this.getStyle(el, "left"))
+            },
+            getMinLeft: function(el) {
+                return -parseFloat(this.getStyle(el, "margin-left"))
+            },
+            getMaxLeft: function(el) {
+                var ml = this.getMinLeft(el);
+                return this.screen.width - this.getWidth(el) + this.getMinLeft(el);
+            },
+            getMatrix: function(el) {
+                var matrix = this.getStyle(el, "transform")
+                // var str = 'matrix(1, 0, 0, 1, -72.6667, -72.6667)'
+                var matrixReg = /^matrix\((.*?)\)$/
+                var m = matrix.replace(matrixReg, function(all, m) { return m }).split(',').map(function(t) { return parseFloat(t) })
+                return m
+            },
+            computed: function(el, e, act) {
+                this._width = this.getWidth(el);
+                this._height = this.getHeight(el);
+                this._top = this.getTop(el);
+                this._left = this.getLeft(el);
+                this._matrix = this.getMatrix(el);
+                this._minLeft = this.getMinLeft(el);
+                this._minTop = this.getMinTop(el);
+                this._maxLeft = this.getMaxLeft(el);
+                this._maxTop = this.getMaxTop(el);
+                this._right = this._left + this._width;
+
+                this._ma = this._matrix[0];
+                this._md = this._matrix[3];
+                this._me = this._matrix[4];
+                this._mf = this._matrix[5];
+                if (e) {
+                    e.preventDefault();
+                    this.x = e.clientX;
+                    this.y = e.clientY;
+                }
+
+                if (act) {
+                    this._act = act;
+                } else {
+                    this._act = ""
+                }
+                // console.log(this._matrix)
+                // console.log("_width:" + this._width)
+                // console.log("_height:" + this._height)
+                // console.log("_top" + this._top)
+                // console.log("_left" + this._left)
+                // console.log(this._act)
+
+            },
+            addEvent: function(el, type, listener) {
+                if (window.addEventListener) {
+                    el.addEventListener(type, listener, false);
+                } else {
+                    el.attachEvent('on' + type, listener);
+                }
+            },
+
+            translate: function(el, x, y) {
+                //"translate3d(" + offx + "px," + offy + "px,0)";
+                // el.style.webkitTransform = "matrix(1,0,0,1," + x + "," + y + ")";
+                el.style.webkitTransform = "matrix(" + this._ma + ",0,0," + this._md + "," + x + this._me + "," + y + this._mf + ")";
+            },
+            scale: function(el, sx, sy) {
+                // el.style.webkitTransform = "matrix(" + sx + ",0,0," + sy + ",0,0)";
+                el.style.webkitTransform = "matrix(" + sx + ",0,0," + sy + "," + this._me + "," + this._mf + ")";
+            },
+            rotate: function(el, x, y) {
+                el.style.webkitTransform = "rotate(" + (Math.atan2(y, x) * 180 / Math.PI) + "deg)"
+            },
+            skew: function(el, x, y) {
+                el.style.webkitTransform = "skew(0," + (Math.atan2(y, x) * 180 / Math.PI) + "deg)"
+            },
+            drag: function(el, x, y) {
+                el.style.left = Math.max(Math.min(x + this._left, this._maxLeft), this._minLeft) + "px";
+                el.style.top = Math.max(Math.min(y + this._top, this._maxTop), this._minTop) + "px";
+            },
+            dragRight: function(el, x, y) {
+                el.style.width = Math.min(this._width + x, this.screen.width - this._left + this._minLeft) + "px"
+            },
+            dragLeft: function(el, x, y) {
+                el.style.left = Math.max(this._left + x, this._minLeft) + "px"
+                el.style.width = Math.min(this._width - x, this.screen.width) + "px" //- _left - this._width + x
+            },
+            dragBottom: function(el, x, y) {
+                el.style.height = Math.min(this._height + y, this.screen.height - this._top + this._minTop) + "px"
+            },
+            dragTop: function(el, x, y) {
+                el.style.top = Math.max(this._top + y, this._minTop) + "px"
+                el.style.height = this._height - y + "px"
+            },
+            dragBottomRight: function(el, x, y) {
+                var transform = this.btnGroup.getAttribute("value")
+                if (transform) {
+                    this[transform](el, x, y)
+                } else {
+                    this.dragRight(el, x, y)
+                    this.dragBottom(el, x, y)
+                }
+            },
+            dragBottomLeft: function(el, x, y) {
+                var transform = this.btnGroup.getAttribute("value")
+                if (transform) {
+                    this[transform](el, x, y)
+                } else {
+                    this.dragLeft(el, x, y)
+                    this.dragBottom(el, x, y)
+                }
+            },
+            dragTopRight: function(el, x, y) {
+                var transform = this.btnGroup.getAttribute("value")
+                if (transform) {
+                    this[transform](el, x, y)
+                } else {
+                    this.dragRight(el, x, y)
+                    this.dragTop(el, x, y)
+                }
+            },
+            dragTopLeft: function(el, x, y) {
+                var transform = this.btnGroup.getAttribute("value")
+                if (transform) {
+                    this[transform](el, x, y)
+                } else {
+                    this.dragLeft(el, x, y)
+                    this.dragTop(el, x, y)
+                }
+            },
+            setup: function() {
+                var self = this;
+                // this.computed();
+                var clickHandle = function(e) {
+                    var e = e || window.event;
+                    var btn = e.target;
+                    if (btn.className.indexOf("add") >= 0) {
+                        self.createOverlay();
+                    } else {
+                        self.btns.forEach(function(t) {
+                            if (t == btn) {
+                                if (t.getAttribute("isactive")) {
+                                    t.removeAttribute("isactive")
+                                    self.btnGroup.removeAttribute("value");
+                                } else {
+                                    t.setAttribute("isactive", "true")
+                                    self.btnGroup.setAttribute("value", t.className.split(" ")[1])
+                                }
+                            } else {
+                                t.removeAttribute("isactive")
+                            }
+                        })
+                    }
+                }
+                this.btns.forEach(function(t) {
+                    self.addEvent(t, "click", clickHandle)
+                })
+                //首字母大写
+                var capitalize = function(word) {
+                    return word.substring(0, 1).toUpperCase() + word.substring(1);
+                };
+                //驼峰命名
+                var camelCase = function(word) {
+                    return "drag" + word.split("-").map(function(t) {
+                        return capitalize(t)
+                    }).join("")
+                };
+                var mapHandleName = function(className) {
+                    return camelCase(className.split(" ")[1])
+                }
+                var closest = function(el, cls) {
+                    if (!el.parentNode) { //document
+                        return null
+                    } else if (el.className.indexOf(cls) >= 0) {
+                        return el;
+                    } else {
+                        return closest(el.parentNode, cls)
+                    }
+                }
+
+                //操作开始
+                var startHandle = function(e) {
+                    var e = e || window.event;
+                    var act = "drag",
+                        target = e.target;
+                    if (target.className.indexOf("resize-handle") >= 0) {
+                        act = mapHandleName(target.className)
+                    }
+
+                    var overlay = closest(target, "customize-overlay");
+                    if (overlay) {
+                        overlay.setAttribute("isActive", "true");
+                        self.el = overlay
+                        self.computed(overlay, e, act);
+                    }
+                }
+                self.addEvent(this.container, "mousedown", startHandle)
+
+                document.onmousemove = function(e) {
+                    // console.log("_act", self._act)
+                    var e = e || event
+                    if (!self._act) return false;
+                    var offx = e.clientX - self.x,
+                        offy = e.clientY - self.y;
+                    self[self._act] && self[self._act](self.el, offx, offy);
+                }
+                document.onmouseup = function(e) {
+                    self._act = ""
+                    var overlays = document.querySelectorAll(".customize-overlay")
+                    overlays.forEach(function(t) {
+                        t.removeAttribute("isActive")
+                    });
+                }
+                //todo 
+                // el.addEventListener("touchstart", function(e) {
+                //     console.log(e)
+                //     var e = e || event;
+                //     e.preventDefault();
+
+                // }, false)
+
+            }
+
+        })
+
+    }();
+
+    console.log(dragger())
+    </script>
+</body>
+
+</html>
