@@ -1,6 +1,6 @@
 # drag
 
-a simple dragging demo,wish u gays like it
+a simple dragging demo,wish u guys like it
 
 
 https://walt2016.github.io/drag/drag.htm
