@@ -668,40 +668,20 @@ q .customize-overlay:hover,
                 el.style.height = this._height - y + "px"
             },
             dragBottomRight: function(el, x, y) {
-                var transform = this.btnGroup.getAttribute("value")
-                if (transform) {
-                    this[transform](el, x, y)
-                } else {
-                    this.dragRight(el, x, y)
-                    this.dragBottom(el, x, y)
-                }
+                this.dragRight(el, x, y)
+                this.dragBottom(el, x, y)
             },
             dragBottomLeft: function(el, x, y) {
-                var transform = this.btnGroup.getAttribute("value")
-                if (transform) {
-                    this[transform](el, x, y)
-                } else {
-                    this.dragLeft(el, x, y)
-                    this.dragBottom(el, x, y)
-                }
+                this.dragLeft(el, x, y)
+                this.dragBottom(el, x, y)
             },
             dragTopRight: function(el, x, y) {
-                var transform = this.btnGroup.getAttribute("value")
-                if (transform) {
-                    this[transform](el, x, y)
-                } else {
-                    this.dragRight(el, x, y)
-                    this.dragTop(el, x, y)
-                }
+                this.dragRight(el, x, y)
+                this.dragTop(el, x, y)
             },
             dragTopLeft: function(el, x, y) {
-                var transform = this.btnGroup.getAttribute("value")
-                if (transform) {
-                    this[transform](el, x, y)
-                } else {
-                    this.dragLeft(el, x, y)
-                    this.dragTop(el, x, y)
-                }
+                this.dragLeft(el, x, y)
+                this.dragTop(el, x, y)
             },
             //吸附
             attract: function(el) {
@@ -764,10 +744,10 @@ q .customize-overlay:hover,
                                 if (t == btn) {
                                     if (t.getAttribute("isactive")) {
                                         t.removeAttribute("isactive")
-                                        self.btnGroup.removeAttribute("value");
+                                        self._transform = ""
                                     } else {
                                         t.setAttribute("isactive", "true")
-                                        self.btnGroup.setAttribute("value", value)
+                                        self._transform = value
                                     }
                                 } else {
                                     t.removeAttribute("isactive")
@@ -822,12 +802,21 @@ q .customize-overlay:hover,
                 self.addEvent(this.container, "mousedown", startHandle)
 
                 document.onmousemove = function(e) {
-                    // console.log("_act", self._act)
                     var e = e || event
                     if (!self._act) return false;
                     var offx = e.clientX - self.x,
                         offy = e.clientY - self.y;
-                    self[self._act] && self[self._act](self.el, offx, offy);
+
+                    if (['drag','dragLeft','dragTop','dragRight','dragBottom'].indexOf(self._act) >=0) {
+                        self[self._act] && self[self._act](self.el, offx, offy);
+                    } else {
+                        if (self._transform) {
+                            self[self._transform] && self[self._transform](self.el, offx, offy)
+                        } else {
+                            self[self._act] && self[self._act](self.el, offx, offy);
+                        }
+                    }
+
                 }
                 document.onmouseup = function(e) {
                     self._act = ""
