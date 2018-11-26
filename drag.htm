@@ -73,6 +73,19 @@ q .customize-overlay:hover,
     margin-top: -50px;*/
 }
 
+.overlay-id{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border:1px solid #ccc;
+    text-align: center;
+
+    line-height: 30px;
+    background: #fff;
+    font-size: 12px;
+
+}
+
 .content-wrapper,
 .wrapper {
     display: -webkit-box;
@@ -537,7 +550,10 @@ q .customize-overlay:hover,
                 var frag = document.createDocumentFragment()
                 var overlay = document.createElement("div");
                 overlay.id = "overlay_" + this.id++;
-                overlay.innerText = this.id
+                var idText=document.createElement("div");
+                idText.className="overlay-id"
+                idText.innerText = this.id
+                overlay.appendChild(idText);
                 overlay.className = "customize-overlay center";
                 overlay.style.width = 3 * this.block.width + "px";
                 overlay.style.height = 3 * this.block.height + "px";
