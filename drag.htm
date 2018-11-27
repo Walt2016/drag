@@ -448,6 +448,7 @@
     font-size: 12px;
 
 }
+
 .close {
     background: #fff;
     color: #000;
@@ -502,8 +503,8 @@ blockquote::before {
     font-weight: bolder;
 }
 
-.customize-overlay::before{
-    content:"\2605";
+.customize-overlay::before {
+    content: "\2605";
     position: absolute;
     z-index: -1;
     font-size: 50px;
@@ -587,20 +588,51 @@ blockquote::before {
         };
     }();
 
+    //位置信息
+    var posinfo = function() {
+        function Posinfo(el, limited) {
+            if (!(this instanceof Posinfo)) return new Posinfo(el, limited);
+            if (!el) {
+                console.log("el is null")
+                return false
+            }
+            var self = this;
+            ["width", "height", "top", "left"].forEach(function(t) {
+                self[t] = parseFloat(self.getStyle(el, t))
+            });
+
+            this["minTop"] = -1 * parseFloat(this.getStyle(el, "margin-top"));
+            this["minLeft"] = -1 * parseFloat(this.getStyle(el, "margin-left"));
+            if (limited) {
+                //     // x: document.documentElement.clientWidth,
+                //     // y: document.documentElement.clientHeight
+                this["maxTop"] = limited.height - this.height + this.minTop;
+                this["maxLeft"] = limited.width - this.width + this.minLeft;
+            }
+        }
+
+        return createClass(Posinfo, {
+            getStyle: function(el, attr) {
+                return window.getComputedStyle ? window.getComputedStyle(el, null)[attr] : el.currentStyle[attr]
+            },
+            // getMatrix: function(el) {
+            //     var matrix = this.getStyle(el, "transform")
+            //     // var str = 'matrix(1, 0, 0, 1, -72.6667, -72.6667)'
+            //     var matrixReg = /^matrix\((.*?)\)$/
+            //     var m = matrix.replace(matrixReg, function(all, m) { return m }).split(',').map(function(t) { return parseFloat(t) })
+            //     return m
+            // },
+
+        })
+    }();
+
     var dragger = function() {
         function Dragger(options) {
             if (!(this instanceof Dragger)) return new Dragger(options);
             this.btns = document.querySelectorAll(".btn");
             this.btnGroup = document.querySelector(".btn-group")
             this.container = document.querySelector(".container")
-            this.screen = {
-                // x: document.documentElement.clientWidth,
-                // y: document.documentElement.clientHeight
-                left: this.getLeft(this.container),
-                top: this.getTop(this.container),
-                width: this.getWidth(this.container),
-                height: this.getHeight(this.container)
-            };
+            this.limited = posinfo(this.container)
             this.id = 0;
             this.setup();
         }
@@ -620,10 +652,7 @@ blockquote::before {
                 this.container.appendChild(frag)
 
                 var cell = document.querySelector(".grid-cell")
-                this.block = cell ? {
-                    width: this.getWidth(cell),
-                    height: this.getHeight(cell)
-                } : {
+                this.block = cell ? posinfo(cell) : {
                     width: 100,
                     height: 100
                 }
@@ -660,7 +689,7 @@ blockquote::before {
             },
             createOverlay: function() {
                 var frag = document.createDocumentFragment()
-                var overlay = document.createElement("div");// blockquote
+                var overlay = document.createElement("div"); // blockquote
                 overlay.id = "overlay_" + this.id++;
                 // <span class="close"></span>
                 var close = document.createElement("span");
@@ -694,57 +723,14 @@ blockquote::before {
                     this.container.setAttribute("flex", "")
                 }
             },
-            getStyle: function(el, attr) {
-                return window.getComputedStyle ? window.getComputedStyle(el, null)[attr] : el.currentStyle[attr]
-            },
-            getWidth: function(el) {
-                return parseFloat(this.getStyle(el, "width"))
-            },
-            getHeight: function(el) {
-                return parseFloat(this.getStyle(el, "height"))
-            },
-            getTop: function(el) {
-                return parseFloat(this.getStyle(el, "top"))
-            },
-            getMinTop: function(el) {
-                return -parseFloat(this.getStyle(el, "margin-top"))
-            },
-            getMaxTop: function(el) {
-                return this.screen.height - this.getHeight(el) + this.getMinTop(el);
-            },
-            getLeft: function(el) {
-                return parseFloat(this.getStyle(el, "left"))
-            },
-            getMinLeft: function(el) {
-                return -parseFloat(this.getStyle(el, "margin-left"))
-            },
-            getMaxLeft: function(el) {
-                var ml = this.getMinLeft(el);
-                return this.screen.width - this.getWidth(el) + this.getMinLeft(el);
-            },
-            getMatrix: function(el) {
-                var matrix = this.getStyle(el, "transform")
-                // var str = 'matrix(1, 0, 0, 1, -72.6667, -72.6667)'
-                var matrixReg = /^matrix\((.*?)\)$/
-                var m = matrix.replace(matrixReg, function(all, m) { return m }).split(',').map(function(t) { return parseFloat(t) })
-                return m
-            },
-            computed: function(el, e, act) {
-                this._width = this.getWidth(el);
-                this._height = this.getHeight(el);
-                this._top = this.getTop(el);
-                this._left = this.getLeft(el);
-                this._matrix = this.getMatrix(el);
-                this._minLeft = this.getMinLeft(el);
-                this._minTop = this.getMinTop(el);
-                this._maxLeft = this.getMaxLeft(el);
-                this._maxTop = this.getMaxTop(el);
-                this._right = this._left + this._width;
 
-                this._ma = this._matrix[0];
-                this._md = this._matrix[3];
-                this._me = this._matrix[4];
-                this._mf = this._matrix[5];
+            computed: function(el, e, act) {
+                this.pos = posinfo(el, this.limited)
+                // this._matrix = this.getMatrix(el);
+                // this._ma = this._matrix[0];
+                // this._md = this._matrix[3];
+                // this._me = this._matrix[4];
+                // this._mf = this._matrix[5];
                 if (e) {
                     e.preventDefault();
                     this.x = e.clientX;
@@ -788,22 +774,22 @@ blockquote::before {
                 el.style.webkitTransform = "skew(0," + (Math.atan2(y, x) * 180 / Math.PI) + "deg)"
             },
             drag: function(el, x, y) {
-                el.style.left = Math.max(Math.min(x + this._left, this._maxLeft), this._minLeft) + "px";
-                el.style.top = Math.max(Math.min(y + this._top, this._maxTop), this._minTop) + "px";
+                el.style.left = Math.max(Math.min(x + this.pos.left, this.pos.maxLeft), this.pos.minLeft) + "px";
+                el.style.top = Math.max(Math.min(y + this.pos.top, this.pos.maxTop), this.pos.minTop) + "px";
             },
             dragRight: function(el, x, y) {
-                el.style.width = Math.min(this._width + x, this.screen.width - this._left + this._minLeft) + "px"
+                el.style.width = Math.min(this.pos.width + x, this.limited.width - this.pos.left + this.pos.minLeft) + "px"
             },
             dragLeft: function(el, x, y) {
-                el.style.left = Math.max(this._left + x, this._minLeft) + "px"
-                el.style.width = Math.min(this._width - x, this.screen.width) + "px" //- _left - this._width + x
+                el.style.left = Math.max(this.pos.left + x, this.pos.minLeft) + "px"
+                el.style.width = Math.min(this.pos.width - x, this.limited.width) + "px" //- _left - this.pos.width + x
             },
             dragBottom: function(el, x, y) {
-                el.style.height = Math.min(this._height + y, this.screen.height - this._top + this._minTop) + "px"
+                el.style.height = Math.min(this.pos.height + y, this.limited.height - this.pos.top + this.pos.minTop) + "px"
             },
             dragTop: function(el, x, y) {
-                el.style.top = Math.max(this._top + y, this._minTop) + "px"
-                el.style.height = this._height - y + "px"
+                el.style.top = Math.max(this.pos.top + y, this.pos.minTop) + "px"
+                el.style.height = this.pos.height - y + "px"
             },
             dragBottomRight: function(el, x, y) {
                 this.dragRight(el, x, y)
@@ -823,11 +809,11 @@ blockquote::before {
             },
             //吸附
             attract: function(el) {
-                // el.style.top = parseInt(this._top / this.block.height) * this.block.height + "px";
-                // el.style.left = parseInt(this._left / this.block.width) * this.block.width + "px";
+                // el.style.top = parseInt(this.pos.top / this.block.height) * this.block.height + "px";
+                // el.style.left = parseInt(this.pos.left / this.block.width) * this.block.width + "px";
 
                 var halfWidth = this.block.width / 2
-                var k = parseInt(this._left / halfWidth)
+                var k = parseInt(this.pos.left / halfWidth)
                 if (k % 2 === 0) {
                     el.style.left = k / 2 * this.block.width + "px";
                 } else {
@@ -835,7 +821,7 @@ blockquote::before {
                 }
 
                 var halfHeight = this.block.height / 2
-                var n = parseInt(this._top / halfHeight)
+                var n = parseInt(this.pos.top / halfHeight)
 
                 if (n % 2 === 0) {
                     el.style.top = n / 2 * this.block.height + "px";
@@ -844,14 +830,14 @@ blockquote::before {
                 }
 
 
-                var attrRight = parseInt(this._width / halfWidth);
+                var attrRight = parseInt(this.pos.width / halfWidth);
                 if (attrRight % 2 === 0) {
                     el.style.width = attrRight / 2 * this.block.width + "px";
                 } else {
                     el.style.width = (attrRight + 1) / 2 * this.block.width + "px";
                 }
 
-                var attrBottom = parseInt(this._height / halfHeight);
+                var attrBottom = parseInt(this.pos.height / halfHeight);
                 if (attrBottom % 2 === 0) {
                     el.style.height = attrBottom / 2 * this.block.height + "px";
                 } else {
@@ -861,6 +847,8 @@ blockquote::before {
             setup: function() {
                 var self = this;
                 self.creatGrid();
+
+
                 // self.createTableGrid();
                 // this.computed();
                 var btnClickHandle = function(e) {
