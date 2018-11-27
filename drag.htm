@@ -11,7 +11,7 @@
     -webkit-text-size-adjust: none;
 }
 
-q .customize-overlay:hover,
+.customize-overlay:hover,
 .customize-overlay.active,
 .customize-overlay[isactive],
 .selected .customize-overlay {
@@ -73,11 +73,11 @@ q .customize-overlay:hover,
     margin-top: -50px;*/
 }
 
-.overlay-id{
+.overlay-id {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border:1px solid #ccc;
+    border: 1px solid #ccc;
     text-align: center;
 
     line-height: 30px;
@@ -550,8 +550,8 @@ q .customize-overlay:hover,
                 var frag = document.createDocumentFragment()
                 var overlay = document.createElement("div");
                 overlay.id = "overlay_" + this.id++;
-                var idText=document.createElement("div");
-                idText.className="overlay-id"
+                var idText = document.createElement("div");
+                idText.className = "overlay-id"
                 idText.innerText = this.id
                 overlay.appendChild(idText);
                 overlay.className = "customize-overlay center";
@@ -823,7 +823,7 @@ q .customize-overlay:hover,
                     var offx = e.clientX - self.x,
                         offy = e.clientY - self.y;
 
-                    if (['drag','dragLeft','dragTop','dragRight','dragBottom'].indexOf(self._act) >=0) {
+                    if (['drag', 'dragLeft', 'dragTop', 'dragRight', 'dragBottom'].indexOf(self._act) >= 0) {
                         self[self._act] && self[self._act](self.el, offx, offy);
                     } else {
                         if (self._transform) {
